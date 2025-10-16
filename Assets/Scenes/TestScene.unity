@@ -510,7 +510,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
   speed: 5
-  _action: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  gravity: -9.81
+  jumpHeight: 2
+  action: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  _hexed: 0
 --- !u!143 &1043304590
 CharacterController:
   m_ObjectHideFlags: 0
