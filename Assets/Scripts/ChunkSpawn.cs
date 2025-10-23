@@ -26,11 +26,10 @@ public class ChunkSpawn : MonoBehaviour
                 GameObject newChunk;
                 newChunk = randomizeChunk(chunkTypes,chunkNumber);
                 float cWidth = newChunk.GetComponent<MeshRenderer>().bounds.size.x;
-                float cHeight = newChunk.GetComponent<MeshRenderer>().bounds.size.y;
-                float rot = 0f + 90f * Random.Range(0f,3f);
-                Quaternion rotation = Quaternion.identity;
-                rotation.Set(rot, 0f, 0f,Quaternion.identity.w);
-                Vector3 spawnPos = startPos + new Vector3(w * cWidth / 2, h * cHeight / 2, 0);
+                float cHeight = newChunk.GetComponent<MeshRenderer>().bounds.size.z;
+                int rot = 0 + (90 * Random.Range(0,3));
+                Quaternion rotation = Quaternion.Euler(0,rot,0);
+                Vector3 spawnPos = startPos + new Vector3(w * cWidth, 0f, h * cHeight);
                 Instantiate(newChunk, spawnPos, rotation);
             }
             
