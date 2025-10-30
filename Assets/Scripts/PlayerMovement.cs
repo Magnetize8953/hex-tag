@@ -11,10 +11,11 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 velocity;
     private bool grounded;
 
+    [SerializeField] private InputActionAsset action;
+    
     [SerializeField] private float speed = 5f;
     [SerializeField] private float gravity = -9.81f;
     [SerializeField] private float jumpHeight = 2f;
-    [SerializeField] private InputActionAsset action;
     [SerializeField] private bool _hexed;
     public bool Hexed
     {
@@ -69,6 +70,8 @@ public class PlayerMovement : MonoBehaviour
         }
 
         Vector3 trueMove = new Vector3(this.move.x, 0, this.move.y);
+        trueMove = transform.TransformDirection(trueMove);//converting from local to world space (credit to ChatGPT to enable look-driven turning)
+
         trueMove.Normalize(); // normalize the vector to bring its magnitude to 1
 
         this.controller.Move(trueMove * this.speed * Time.deltaTime);
