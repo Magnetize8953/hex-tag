@@ -6,113 +6,100 @@ public class ChunkSpawn : MonoBehaviour
 
     [SerializeField] private GameObject[] chunkTypes;
     [SerializeField] private int gridSize;
-    private int chunkNumber;
-    private Vector3 startPos = Vector3.zero;
+    private int numOfChunkTypes;
+    private List<GameObject> chunks;
+    private List<GameObject> walls;
+    // one scale unit in unity is equal to 10 on the transform.scale thingy
+    private int unityOneBlockLength = 10;
 
-
-    GameObject randomizeChunk(GameObject[] cList, int cNum)
-    {
-        GameObject selectedChunk;
-        int randomizedChunk = Random.Range(0, cNum);
-        selectedChunk = cList[randomizedChunk];
-        return selectedChunk;
-    }
-
-    void createGrid(int gSize)
-    {
-        float cW = chunkTypes[0].GetComponent<MeshRenderer>().bounds.size.x;
-        float cH = chunkTypes[0].GetComponent<MeshRenderer>().bounds.size.z;
-        for (int w = 0; w < gSize; w++)
-        {
-            for(int h = 0; h < gSize; h++)
-            {
-                
-                GameObject newChunk;
-                newChunk = randomizeChunk(chunkTypes,chunkNumber);
-                float cWidth = newChunk.GetComponent<MeshRenderer>().bounds.size.x;
-                float cHeight = newChunk.GetComponent<MeshRenderer>().bounds.size.z;
-                int rot = 0 + (90 * Random.Range(0,3));
-                Quaternion rotation = Quaternion.Euler(0,rot,0);
-                Vector3 spawnPos = startPos + new Vector3(w * cWidth, 0f, h * cHeight);
-                Instantiate(newChunk, spawnPos, rotation);
-                /*if (w == 0 && h == 0)
-                {
-                    //Creates Topmost wall.
-                    GameObject wallTop = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                    //Sets scale to match size of grid.
-                    float cubeWidth = wallTop.GetComponent<MeshRenderer>().bounds.size.x;
-                    float wallScaler = (cWidth / cubeWidth) * gridSize;
-                   
-                    Vector3 wallScaling = Vector3.one;
-                    wallScaling.x = wallScaler + (cubeWidth/2);
-                    wallScaling.y = 10;
-                    //Sets position of Topmost wall.
-                    Vector3 wallPos = startPos;
-                    
-                    wallPos.x = wallPos.x +cHeight;
-                    wallPos.z = wallPos.z - (cWidth / 2) - (cubeWidth/2);
-                    wallTop.transform.position = wallPos;
-                    wallTop.transform.localScale = wallScaling;
-                }*/
-            }
-            
-        }
-        createWalls(cW,cH,gridSize);
-    }
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        chunkNumber = chunkTypes.Length;
-        createGrid(gridSize);
+        this.numOfChunkTypes = this.chunkTypes.Length;
+        this.chunks = new List<GameObject>();
+        this.walls = new List<GameObject>();
+        createGrid(this.gridSize);
         Destroy(this);
     }
 
-    void createWalls(float chunkWidth, float chunkHeight, int gridSize = 1)
+    void createGrid(int gridSize)
     {
-         List<GameObject> walls = new List<GameObject>();
-        //Creates Wall.
-        for (int i = 0; i < 4; i++) {
-            walls.Add(GameObject.CreatePrimitive(PrimitiveType.Cube));
-        }
-        //Sets scale to match size of grid.
-        float cubeWidth = walls[0].GetComponent<MeshRenderer>().bounds.size.x;
-        float wallScaler = (chunkWidth / cubeWidth) * gridSize;
 
-        Vector3 wallScaling = Vector3.one;
-        wallScaling.x = wallScaler + (cubeWidth / 2);
-        wallScaling.y = 10;
-        //Sets position of Topmost wall.
-        Vector3 wallPos = startPos;
-
-        Quaternion wallSidesRot = Quaternion.Euler(0, 90, 0);
-        wallPos.x = wallPos.x + chunkHeight;
-        wallPos.z = wallPos.z - (chunkWidth / 2) - (cubeWidth / 2);
-        walls[0].transform.position = wallPos;
-
-        //wallPos = startPos;
-        wallPos.x = wallPos.x + (chunkWidth * gridSize) / 2 + (cubeWidth/2);
-        wallPos.z = wallPos.z + (chunkHeight * gridSize) / 2 + (cubeWidth/2);
-        walls[1].transform.rotation = wallSidesRot;
-        walls[1].transform.position = wallPos;
-
-        wallPos = startPos;
-        wallPos.x = wallPos.x + chunkHeight;
-        wallPos.z = wallPos.z + (chunkWidth * gridSize) - (chunkWidth/2) + (cubeWidth/2);
-        walls[2].transform.position = wallPos;
-
-        //This is the funky evil wall that keeps fucking me up :( -Mathew
-        wallPos = startPos;
-        wallPos.x = wallPos.x - (chunkWidth * gridSize) / 2 + (cubeWidth / 2);
-        wallPos.z = wallPos.z + (chunkHeight * gridSize) / 2 + (cubeWidth / 2);
-        walls[3].transform.rotation = wallSidesRot;
-        walls[3].transform.position = wallPos;
-
-
-        for (int j = 0; j < 4; j++)
+        // loop through the rows and columns of the grid
+        for (int row = 0; row < gridSize; row++)
         {
-            walls[j].transform.localScale = wallScaling;
+
+            for(int column = 0; column < gridSize; column++)
+            {
+
+                // select a random chunk and grab its width and length for later positioning
+                GameObject newChunk = randomizeChunk(this.chunkTypes, this.numOfChunkTypes);
+                float newChunkWidth = newChunk.transform.localScale.x;
+                float newChunkLength = newChunk.transform.localScale.z;
+
+                // get a random 90 degree rotation
+                int rot = 90 * Random.Range(0,3);
+                Quaternion rotation = Quaternion.Euler(0, rot, 0);
+
+                // get the current chunk's spawn position based off which row and column it is
+                Vector3 spawnPos = new Vector3(row * newChunkWidth, 0f, column * newChunkLength);
+
+                // instantiate the chunk and add it to the chunks list for later potential use
+                this.chunks.Add(Instantiate(newChunk, spawnPos, rotation, this.transform));
+
+            }
         }
 
+        // chunk widths and lengths. used for positioning
+        float chunkWidth = this.chunkTypes[0].transform.localScale.x;
+        float chunkLength = this.chunkTypes[0].transform.localScale.z;
+
+        // move all chunks such that the centre is at 0, 0, 0
+        // this math looks weird, and is probably redundant in many places, but this was the best way to step-by-step visualise it
+        //   get 1 chunk width and multiply it by the length of a unity scale (explained poorly above) to get how long one chunk is
+        //   divide this by 2 because we want to centre the chunks and therefore need to work by 1/2 intervals
+        //   multiply the grid size to push the chunks such that half is before 0, 0 and half is after
+        //   make all this negative because of the direction chunk instantiation happened
+        //   add back one half because ??????
+        float offset = -(((chunkWidth * this.unityOneBlockLength) / 2) * this.gridSize) + ((chunkWidth * this.unityOneBlockLength) / 2);
+        this.transform.position = new Vector3(offset, 0, offset);
+
+        // create walls
+        createWalls(chunkWidth, chunkLength);
+
+    }
+
+    GameObject randomizeChunk(GameObject[] chunkList, int chunkNumber)
+    {
+        int randomizedChunk = Random.Range(0, chunkNumber);
+        GameObject selectedChunk = chunkList[randomizedChunk];
+        return selectedChunk;
+    }
+
+    void createWalls(float chunkWidth, float chunkLength)
+    {
+
+        // create four walls
+        for (int i = 0; i < 4; i++)
+        {
+
+            // create individual wall
+            GameObject wall = GameObject.CreatePrimitive(PrimitiveType.Cube);
+
+            // scale wall
+            float length = chunkWidth * this.gridSize * this.unityOneBlockLength;
+            wall.transform.localScale = new Vector3(length, 2, 0.5f);
+
+            // rotate wall
+            int rot = 90 * i;
+            Quaternion rotation = Quaternion.Euler(0, rot, 0);
+            wall.transform.rotation = rotation;
+
+            // move wall forward
+            wall.transform.position += wall.transform.forward * (this.gridSize * ((this.unityOneBlockLength / 2) * chunkWidth));
+            // and up
+            wall.transform.position = new Vector3(wall.transform.position.x, 1, wall.transform.position.z);
+
+        }
 
     }
 
