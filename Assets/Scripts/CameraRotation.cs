@@ -7,8 +7,8 @@ public class CameraRotation : MonoBehaviour
     private InputAction xLookAction;
     private InputAction yLookAction;
         
-    public float sensitivityX = 0.01f;
-    public float sensitivityY = 0.01f;
+    public float sensitivityX = 0.001f;
+    public float sensitivityY = 0.001f;
 
     [SerializeField] private PlayerMovement player; //holder for the parent player object
 

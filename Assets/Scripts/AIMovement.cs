@@ -20,11 +20,15 @@ public class AIMovement : MonoBehaviour
         set => this._hexed = value;
     }
 
+    private ParticleSystem hexParticles;
+    private bool isSpawning = false;
+
     private void Awake()
     {
         this.speed = 5.0f;
         this.radiusOfSatisfaction = 1.0f;
         this.controller = GetComponent<CharacterController>();
+        this.hexParticles = GetComponent<ParticleSystem>();
     }
 
     private void Update()
@@ -48,6 +52,14 @@ public class AIMovement : MonoBehaviour
             }
 
             RunKinematicArrive(this.randomMapLocation);
+        }
+
+        if (this._hexed && !isSpawning) {
+            hexParticles.Play();
+            isSpawning = true;
+        } else if (!this._hexed && isSpawning) {
+            hexParticles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            isSpawning = false;
         }
     }
 

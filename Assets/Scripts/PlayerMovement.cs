@@ -23,6 +23,10 @@ public class PlayerMovement : MonoBehaviour
         set => this._hexed = value;
     }
 
+    private ParticleSystem hexParticles;
+    private bool isSpawning = false;
+    
+
     private void Awake()
     {
         this._hexed = false;
@@ -43,6 +47,8 @@ public class PlayerMovement : MonoBehaviour
             this.jumpAction.performed += OnJump;
             this.jumpAction.canceled += OnJump;
         }
+
+        this.hexParticles = GetComponent<ParticleSystem>();
     }
 
     private void OnMove(InputAction.CallbackContext context) 
@@ -78,5 +84,25 @@ public class PlayerMovement : MonoBehaviour
 
         this.velocity.y += this.gravity * Time.deltaTime;
         this.controller.Move(this.velocity * Time.deltaTime);
+
+        if (this._hexed && !isSpawning) {
+            hexParticles.Play();
+            isSpawning = true;
+        } else if (!this._hexed && isSpawning) {
+            hexParticles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            isSpawning = false;
+        }
     }
+
+    
+    private void OnTriggerEnter(Collider other)
+    {
+        Debug.Log("Collided with " + other.gameObject.ToString());
+        if (other.gameObject.tag == "AI")
+        {
+            Debug.Log("COLLIDED WITH AI");
+            Debug.Log("Status of hexed -> " + this._hexed);
+        }
+    }
+    
 }
