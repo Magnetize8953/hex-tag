@@ -33,8 +33,8 @@ public class ChunkSpawn : MonoBehaviour
 
                 // select a random chunk and grab its width and length for later positioning
                 GameObject newChunk = randomizeChunk(this.chunkTypes, this.numOfChunkTypes);
-                float newChunkWidth = newChunk.transform.localScale.x;
-                float newChunkLength = newChunk.transform.localScale.z;
+                float newChunkWidth = newChunk.GetComponent<MeshRenderer>().bounds.size.x;
+                float newChunkLength = newChunk.GetComponent<MeshRenderer>().bounds.size.z;
 
                 // get a random 90 degree rotation
                 int rot = 90 * Random.Range(0,3);
