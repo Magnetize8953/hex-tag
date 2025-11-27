@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-
+    [SerializeField] private int hexPassDelay = 5;
     [SerializeField] private float _hexPassDelayCountdown;
     public float HexPassDelayCountdown
     {
@@ -17,12 +17,7 @@ public class GameManager : MonoBehaviour
         set => this._hexedPlayer = value;
     }
     private List<Vector3> _worldGraph;
-    public List<Vector3> WorldGraph
-    {
-        get => this._worldGraph;
-    }
-
-    [SerializeField] private int hexPassDelay = 5;
+    public List<Vector3> WorldGraph { get => this._worldGraph; }
 
     private void Awake()
     {
@@ -36,11 +31,11 @@ public class GameManager : MonoBehaviour
         int selectedPlayer = Random.Range(0, enemies.Length + 1);
         if (selectedPlayer == enemies.Length)
         {
-            userPlayer.GetComponent<PlayerMovement>().Hexed = true;
+            userPlayer.GetComponent<HexManager>().Hexed = true;
         }
         else
         {
-            enemies[selectedPlayer].GetComponent<AIMovement>().Hexed = true;
+            enemies[selectedPlayer].GetComponent<HexManager>().Hexed = true;
         }
 
         /* fill out world graph */

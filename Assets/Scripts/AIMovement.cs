@@ -4,6 +4,7 @@ public class AIMovement : MonoBehaviour
 {
 
     private GameObject gameManager;
+    private HexManager hexManager;
     private CharacterController controller;
     private float speed;
     private float radiusOfSatisfaction;
@@ -14,39 +15,19 @@ public class AIMovement : MonoBehaviour
     [SerializeField] private Transform targetTransform;
     [SerializeField] private GameObject map;
     [SerializeField] private float gravity = -9.81f;
-    [SerializeField] private bool _hexed;
-    public bool Hexed
-    {
-        get => this._hexed;
-        set => this._hexed = value;
-    }
-
-    private ParticleSystem hexParticles;
-    private bool isSpawning = false;
 
     private void Awake()
     {
         this.speed = 5.0f;
         this.radiusOfSatisfaction = 1.0f;
         this.controller = GetComponent<CharacterController>();
-        this.hexParticles = GetComponent<ParticleSystem>();
+        this.hexManager = GetComponent<HexManager>();
         this.gameManager = GameObject.Find("GameManager");
-
-        if (this._hexed)
-        {
-            hexParticles.Play();
-            isSpawning = true;
-        }
-        else
-        {
-            hexParticles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-            isSpawning = false;
-        }
     }
 
     private void Update()
     {
-        if (this._hexed)
+        if (this.hexManager.Hexed)
         {
             RunKinematicArrive(this.targetTransform.position);
         }
@@ -68,25 +49,6 @@ public class AIMovement : MonoBehaviour
             RunKinematicArrive(this.randomMapLocation);
         }
 
-        if (this._hexed && !isSpawning) {
-            hexParticles.Play();
-            isSpawning = true;
-        } else if (!this._hexed && isSpawning) {
-            hexParticles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-            isSpawning = false;
-        }
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        Debug.Log("Collided with " + other.gameObject.ToString());
-        if (other.gameObject.tag == "Player" && this._hexed && this.gameManager.GetComponent<GameManager>().HexPassDelayCountdown <= 0)
-        {
-            other.gameObject.GetComponent<PlayerMovement>().Hexed = true;
-            this.gameManager.GetComponent<GameManager>().HexPassDelayCountdown = 5;
-            this._hexed = false;
-            Debug.Log("Hex transferred");
-        }
     }
 
     private void RunKinematicArrive(Vector3 targetPosition)

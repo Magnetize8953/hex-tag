@@ -17,15 +17,6 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float speed = 5f;
     [SerializeField] private float gravity = -9.81f;
     [SerializeField] private float jumpHeight = 2f;
-    [SerializeField] private bool _hexed;
-    public bool Hexed
-    {
-        get => this._hexed;
-        set => this._hexed = value;
-    }
-
-    private ParticleSystem hexParticles;
-    private bool isSpawning = false;
 
     private void Awake()
     {
@@ -47,18 +38,6 @@ public class PlayerMovement : MonoBehaviour
             this.jumpAction.started += OnJump;
             this.jumpAction.performed += OnJump;
             this.jumpAction.canceled += OnJump;
-        }
-
-        this.hexParticles = GetComponent<ParticleSystem>();
-        if (this._hexed)
-        {
-            hexParticles.Play();
-            isSpawning = true;
-        }
-        else
-        {
-            hexParticles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-            isSpawning = false;
         }
     }
 
@@ -95,25 +74,5 @@ public class PlayerMovement : MonoBehaviour
 
         this.velocity.y += this.gravity * Time.deltaTime;
         this.controller.Move(this.velocity * Time.deltaTime);
-
-        if (this._hexed && !isSpawning) {
-            hexParticles.Play();
-            isSpawning = true;
-        } else if (!this._hexed && isSpawning) {
-            hexParticles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-            isSpawning = false;
-        }
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        Debug.Log("Collided with " + other.gameObject.ToString());
-        if (other.gameObject.tag == "AI" && this._hexed && this.gameManager.GetComponent<GameManager>().HexPassDelayCountdown <= 0)
-        {
-            other.gameObject.GetComponent<AIMovement>().Hexed = true;
-            this.gameManager.GetComponent<GameManager>().HexPassDelayCountdown = 5;
-            this._hexed = false;
-            Debug.Log("Hex transferred");
-        }
     }
 }
