@@ -4,6 +4,7 @@ using UnityEngine.InputSystem;
 public class PlayerMovement : MonoBehaviour
 {
 
+    private GameObject gameManager;
     private CharacterController controller;
     private InputAction moveAction;
     private InputAction jumpAction;
@@ -12,7 +13,7 @@ public class PlayerMovement : MonoBehaviour
     private bool grounded;
 
     [SerializeField] private InputActionAsset action;
-    
+
     [SerializeField] private float speed = 5f;
     [SerializeField] private float gravity = -9.81f;
     [SerializeField] private float jumpHeight = 2f;
@@ -25,11 +26,11 @@ public class PlayerMovement : MonoBehaviour
 
     private ParticleSystem hexParticles;
     private bool isSpawning = false;
-    
 
     private void Awake()
     {
-        this._hexed = false;
+
+        this.gameManager = GameObject.Find("GameManager");
 
         // map necessary components and inputs
         this.controller = GetComponent<CharacterController>();
@@ -49,6 +50,16 @@ public class PlayerMovement : MonoBehaviour
         }
 
         this.hexParticles = GetComponent<ParticleSystem>();
+        if (this._hexed)
+        {
+            hexParticles.Play();
+            isSpawning = true;
+        }
+        else
+        {
+            hexParticles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            isSpawning = false;
+        }
     }
 
     private void OnMove(InputAction.CallbackContext context) 
@@ -94,15 +105,15 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    
     private void OnTriggerEnter(Collider other)
     {
         Debug.Log("Collided with " + other.gameObject.ToString());
-        if (other.gameObject.tag == "AI")
+        if (other.gameObject.tag == "AI" && this._hexed && this.gameManager.GetComponent<GameManager>().HexPassDelayCountdown <= 0)
         {
-            Debug.Log("COLLIDED WITH AI");
-            Debug.Log("Status of hexed -> " + this._hexed);
+            other.gameObject.GetComponent<AIMovement>().Hexed = true;
+            this.gameManager.GetComponent<GameManager>().HexPassDelayCountdown = 5;
+            this._hexed = false;
+            Debug.Log("Hex transferred");
         }
     }
-    
 }

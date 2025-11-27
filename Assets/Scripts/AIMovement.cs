@@ -3,6 +3,7 @@ using UnityEngine;
 public class AIMovement : MonoBehaviour
 {
 
+    private GameObject gameManager;
     private CharacterController controller;
     private float speed;
     private float radiusOfSatisfaction;
@@ -29,6 +30,18 @@ public class AIMovement : MonoBehaviour
         this.radiusOfSatisfaction = 1.0f;
         this.controller = GetComponent<CharacterController>();
         this.hexParticles = GetComponent<ParticleSystem>();
+        this.gameManager = GameObject.Find("GameManager");
+
+        if (this._hexed)
+        {
+            hexParticles.Play();
+            isSpawning = true;
+        }
+        else
+        {
+            hexParticles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            isSpawning = false;
+        }
     }
 
     private void Update()
@@ -45,7 +58,8 @@ public class AIMovement : MonoBehaviour
             Vector3 mapTopRight = this.map.transform.TransformPoint(new Vector3(5, 0, -5));
 
             // get a random point on the map
-            if (this.randomMapLocation == Vector3.zero)
+            // TODO: clean up to use actual y coords
+            if (new Vector3(myTransform.position.x, 1, myTransform.position.z) == this.randomMapLocation || this.randomMapLocation == Vector3.zero)
             {
                 this.randomMapLocation = new Vector3(Random.Range(mapBottomLeft.x, mapTopRight.x), 1, Random.Range(mapBottomLeft.z, mapTopRight.z));
                 Debug.Log(this.randomMapLocation);
@@ -66,10 +80,12 @@ public class AIMovement : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         Debug.Log("Collided with " + other.gameObject.ToString());
-        if (other.gameObject.tag == "Player" && this._hexed)
+        if (other.gameObject.tag == "Player" && this._hexed && this.gameManager.GetComponent<GameManager>().HexPassDelayCountdown <= 0)
         {
             other.gameObject.GetComponent<PlayerMovement>().Hexed = true;
+            this.gameManager.GetComponent<GameManager>().HexPassDelayCountdown = 5;
             this._hexed = false;
+            Debug.Log("Hex transferred");
         }
     }
 
