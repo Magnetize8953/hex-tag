@@ -27,6 +27,11 @@ public class AIMovement : MonoBehaviour
 
     private void Update()
     {
+        if (this.hexManager.Frozen)
+        {
+            return;
+        }
+
         if (this.hexManager.Hexed)
         {
             RunKinematicArrive(this.targetTransform.position);
@@ -43,7 +48,7 @@ public class AIMovement : MonoBehaviour
             if (new Vector3(myTransform.position.x, 1, myTransform.position.z) == this.randomMapLocation || this.randomMapLocation == Vector3.zero)
             {
                 this.randomMapLocation = new Vector3(Random.Range(mapBottomLeft.x, mapTopRight.x), 1, Random.Range(mapBottomLeft.z, mapTopRight.z));
-                Debug.Log(this.randomMapLocation);
+                Debug.Log("ai going to: " + this.randomMapLocation);
             }
 
             RunKinematicArrive(this.randomMapLocation);

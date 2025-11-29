@@ -5,6 +5,7 @@ public class PlayerMovement : MonoBehaviour
 {
 
     private GameObject gameManager;
+    private HexManager hexManager;
     private CharacterController controller;
     private InputAction moveAction;
     private InputAction jumpAction;
@@ -22,6 +23,7 @@ public class PlayerMovement : MonoBehaviour
     {
 
         this.gameManager = GameObject.Find("GameManager");
+        this.hexManager = GetComponent<HexManager>();
 
         // map necessary components and inputs
         this.controller = GetComponent<CharacterController>();
@@ -63,6 +65,12 @@ public class PlayerMovement : MonoBehaviour
         this.grounded = this.controller.isGrounded;
         if (this.grounded && this.velocity.y < 0f) {
             this.velocity.y = -2f;
+        }
+
+        // there's gotta be a better way to do this
+        if (this.hexManager.Frozen)
+        {
+            return;
         }
 
         Vector3 trueMove = new Vector3(this.move.x, 0, this.move.y);
