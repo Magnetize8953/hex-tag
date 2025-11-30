@@ -7,8 +7,8 @@ public class CameraRotation : MonoBehaviour
     private InputAction xLookAction;
     private InputAction yLookAction;
         
-    public float sensitivityX = 0.001f;
-    public float sensitivityY = 0.001f;
+    public float sensitivityX = 15f;
+    public float sensitivityY = 15f;
 
     [SerializeField] private PlayerMovement player; //holder for the parent player object
 
@@ -37,29 +37,17 @@ public class CameraRotation : MonoBehaviour
     private void OnTurn(InputAction.CallbackContext context)
     {   
         //Grab the horizontal position of the mouse and tune it for sensitivity
-        float mouseX = this.xLookAction.ReadValue<Vector2>().x * sensitivityX; 
+        float mouseX = this.xLookAction.ReadValue<Vector2>().x * sensitivityX * Time.deltaTime;
         //Rotate the parent player representation to change the direction it's facing
         this.player.transform.Rotate(Vector3.up * mouseX, Space.World); 
     }
     
     private void OnLook(InputAction.CallbackContext context)
     {
-        float mouseY = -this.yLookAction.ReadValue<Vector2>().y * sensitivityY;
+        float mouseY = -this.yLookAction.ReadValue<Vector2>().y * sensitivityY * Time.deltaTime;
         rotationY += mouseY;
         rotationY = Mathf.Clamp(rotationY, -90f, 90f);
         this.transform.localEulerAngles = new Vector3(rotationY, 0f, 0f);
     }
 
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }

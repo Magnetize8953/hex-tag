@@ -269,8 +269,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a8679008b72d74ba985427815581a258, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraRotation
-  sensitivityX: 2
-  sensitivityY: 2
+  sensitivityX: 15
+  sensitivityY: 15
   player: {fileID: 290908759}
   action: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
 --- !u!1 &290908758
@@ -5248,6 +5248,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HexManager
   collisionTag: AI
   _hexed: 0
+  _spinTimeMin: 3
+  _spinTimeMax: 7
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -10556,6 +10558,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HexManager
   collisionTag: Player
   _hexed: 0
+  _spinTimeMin: 3
+  _spinTimeMax: 7
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
