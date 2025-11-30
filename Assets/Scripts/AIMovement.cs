@@ -10,6 +10,7 @@ public class AIMovement : MonoBehaviour
     private float radiusOfSatisfaction;
     private Vector3 velocity;
     private Vector3 randomMapLocation;
+    private bool getNewRandLocation = true;
 
     [SerializeField] private Transform myTransform;
     [SerializeField] private Transform targetTransform;
@@ -28,9 +29,7 @@ public class AIMovement : MonoBehaviour
     private void Update()
     {
         if (this.hexManager.Frozen)
-        {
             return;
-        }
 
         if (this.hexManager.Hexed)
         {
@@ -44,10 +43,11 @@ public class AIMovement : MonoBehaviour
             Vector3 mapTopRight = this.map.transform.TransformPoint(new Vector3(5, 0, -5));
 
             // get a random point on the map
-            // TODO: clean up to use actual y coords
-            if (new Vector3(myTransform.position.x, 1, myTransform.position.z) == this.randomMapLocation || this.randomMapLocation == Vector3.zero)
+            if (this.getNewRandLocation)
             {
-                this.randomMapLocation = new Vector3(Random.Range(mapBottomLeft.x, mapTopRight.x), 1, Random.Range(mapBottomLeft.z, mapTopRight.z));
+                float gravityYPos = 0.580005f; // this is approx the y height of players after gravity is applied; a better way probably exists
+                this.randomMapLocation = new Vector3(Random.Range(mapBottomLeft.x, mapTopRight.x), gravityYPos, Random.Range(mapBottomLeft.z, mapTopRight.z));
+                this.getNewRandLocation = false;
                 Debug.Log("ai going to: " + this.randomMapLocation);
             }
 
@@ -64,7 +64,10 @@ public class AIMovement : MonoBehaviour
 
         // return if we am within the radius of satisfaction of the target
         if (towardsTarget.magnitude <= this.radiusOfSatisfaction)
+        {
+            this.getNewRandLocation = true;
             return;
+        }
 
         // normalise because all we care about is direction
         towardsTarget = towardsTarget.normalized;
