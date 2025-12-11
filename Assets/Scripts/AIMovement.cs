@@ -8,7 +8,7 @@ public class AIMovement : MonoBehaviour
     private CharacterController controller;
     private float speed;
     private float radiusOfSatisfaction;
-    private Vector3 velocity;
+    public Vector3 velocity;
     private Vector3 randomMapLocation;
     private bool getNewRandLocation = true;
 
