@@ -33,15 +33,13 @@ public class ChunkSpawn : MonoBehaviour
 
                 // select a random chunk and grab its width and length for later positioning
                 GameObject newChunk = randomizeChunk(this.chunkTypes, this.numOfChunkTypes);
-                float newChunkWidth = newChunk.GetComponent<MeshRenderer>().bounds.size.x;
-                float newChunkLength = newChunk.GetComponent<MeshRenderer>().bounds.size.z;
 
                 // get a random 90 degree rotation
                 int rot = 90 * Random.Range(0,3);
                 Quaternion rotation = Quaternion.Euler(0, rot, 0);
 
                 // get the current chunk's spawn position based off which row and column it is
-                Vector3 spawnPos = new Vector3(row * newChunkWidth, 0f, column * newChunkLength);
+                Vector3 spawnPos = new Vector3(row * this.unityOneBlockLength, 0f, column * this.unityOneBlockLength);
 
                 // instantiate the chunk and add it to the chunks list for later potential use
                 this.Chunks.Add(Instantiate(newChunk, spawnPos, rotation, this.transform));
