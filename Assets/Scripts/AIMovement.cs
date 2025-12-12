@@ -1,29 +1,34 @@
 using UnityEngine;
+using System;
 
 public class AIMovement : MonoBehaviour
 {
 
-    private GameObject gameManager;
+    private System.Random random = new System.Random(); // because seeding is weird with UnityEngine.Random
+    private GameManager gameManager;
     private HexManager hexManager;
     private CharacterController controller;
+
     private float speed;
     private float radiusOfSatisfaction;
     public Vector3 velocity;
+    private float gravityYPos = 0.580005f; // this is approx the y height of players after gravity is applied; a better way probably exists
+
+    private Transform targetTransform;
     private Vector3 randomMapLocation;
     private bool getNewRandLocation = true;
 
-    [SerializeField] private Transform myTransform;
-    [SerializeField] private Transform targetTransform;
-    [SerializeField] private GameObject map;
     [SerializeField] private float gravity = -9.81f;
 
-    private void Awake()
+    private void Start()
     {
         this.speed = 5.0f;
         this.radiusOfSatisfaction = 1.0f;
         this.controller = GetComponent<CharacterController>();
         this.hexManager = GetComponent<HexManager>();
-        this.gameManager = GameObject.Find("GameManager");
+        this.gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+
+        GetRandomPlayerTarget();
     }
 
     private void Update()
@@ -58,7 +63,7 @@ public class AIMovement : MonoBehaviour
     {
 
         // vector from player to target
-        Vector3 towardsTarget = targetPosition - this.myTransform.position;
+        Vector3 towardsTarget = targetPosition - this.transform.position;
 
         // return if we am within the radius of satisfaction of the target
         if (towardsTarget.magnitude <= this.radiusOfSatisfaction)
@@ -72,7 +77,7 @@ public class AIMovement : MonoBehaviour
 
         // smoothly rotate to face target
         Quaternion targetRotation = Quaternion.LookRotation(towardsTarget);
-        this.myTransform.rotation = Quaternion.Lerp(this.myTransform.rotation, targetRotation, 0.1f);
+        this.transform.rotation = Quaternion.Lerp(this.transform.rotation, targetRotation, 0.1f);
 
         // move forward in the direction we are facing
         this.controller.Move(towardsTarget * this.speed * Time.deltaTime);
@@ -86,5 +91,12 @@ public class AIMovement : MonoBehaviour
         this.velocity.y += this.gravity * Time.deltaTime;
         this.controller.Move(this.velocity * Time.deltaTime);
 
+    }
+
+    public void GetRandomPlayerTarget()
+    {
+        this.targetTransform = this.gameManager.Players[random.Next(this.gameManager.Players.Count)].transform;
+        while (this.targetTransform == null || this.targetTransform.transform == this.transform)
+            this.targetTransform = this.gameManager.Players[random.Next(this.gameManager.Players.Count)].transform;
     }
 }

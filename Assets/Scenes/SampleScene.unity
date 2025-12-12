@@ -5246,7 +5246,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c2fdfd8fad2a83c4fbbed4fd74ddcab6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HexManager
-  collisionTag: AI
+  _collisionTag: AI
   _hexed: 0
   _spinTimeMin: 3
   _spinTimeMax: 7
@@ -5712,9 +5712,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4833ceee77f315d428830164aa73329b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  myTransform: {fileID: 1583736580}
-  targetTransform: {fileID: 290908763}
-  map: {fileID: 719663883}
+  velocity: {x: 0, y: 0, z: 0}
   gravity: -9.81
 --- !u!143 &1583736582
 CharacterController:
@@ -10556,7 +10554,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c2fdfd8fad2a83c4fbbed4fd74ddcab6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HexManager
-  collisionTag: Player
+  _collisionTag: Player
   _hexed: 0
   _spinTimeMin: 3
   _spinTimeMax: 7

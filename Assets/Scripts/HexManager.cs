@@ -6,7 +6,8 @@ public class HexManager : MonoBehaviour
     private ParticleSystem hexParticles;
     private GameObject gameManager;
 
-    [SerializeField] private string collisionTag;
+    [SerializeField] private string _collisionTag;
+    public string CollisionTag { get; }
     [SerializeField] private bool _hexed;
     public bool Hexed
     {
@@ -77,7 +78,7 @@ public class HexManager : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         Debug.Log("Collided with " + other.gameObject.ToString());
-        if (other.gameObject.tag == this.collisionTag && this._hexed && this.gameManager.GetComponent<GameManager>().HexPassDelayCountdown <= 0)
+        if (other.gameObject.tag == "Player" && this._hexed && this.gameManager.GetComponent<GameManager>().HexPassDelayCountdown <= 0)
         {
             other.gameObject.GetComponent<HexManager>().Hexed = true;
             other.gameObject.GetComponent<HexManager>().Frozen = true;
@@ -86,6 +87,8 @@ public class HexManager : MonoBehaviour
                 other.gameObject.GetComponent<HexManager>().SpinTimeMax + 1
             );
             other.gameObject.GetComponent<HexManager>().SavedPosition = other.gameObject.transform.position;
+            if (other.GetComponent<AIMovement>() != null)
+                other.gameObject.GetComponent<AIMovement>().GetRandomPlayerTarget();
             this.gameManager.GetComponent<GameManager>().HexPassDelayCountdown = 5;
             this._hexed = false;
             Debug.Log("Hex transferred");

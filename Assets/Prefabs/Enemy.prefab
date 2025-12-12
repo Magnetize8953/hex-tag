@@ -19,7 +19,7 @@ GameObject:
   - component: {fileID: 5793465045106327390}
   m_Layer: 0
   m_Name: Enemy
-  m_TagString: AI
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4878,9 +4878,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   velocity: {x: 0, y: 0, z: 0}
-  myTransform: {fileID: 6869858828392692494}
-  targetTransform: {fileID: 0}
-  map: {fileID: 0}
   gravity: -9.81
 --- !u!199 &8893785746103103322
 ParticleSystemRenderer:
@@ -4974,7 +4971,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c2fdfd8fad2a83c4fbbed4fd74ddcab6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HexManager
-  collisionTag: Player
+  _collisionTag: 
   _hexed: 0
   _spinTimeMin: 3
   _spinTimeMax: 7

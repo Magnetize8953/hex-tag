@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -11,6 +12,7 @@ public class GameManager : MonoBehaviour
         set => this._hexPassDelayCountdown = hexPassDelay; // kinda dumb and confusing outside this line, but shorter than a whole method
     }
 
+    public List<GameObject> Players { get; private set; }
     private GameObject _hexedPlayer;
     public GameObject HexedPlayer
     {
@@ -28,15 +30,14 @@ public class GameManager : MonoBehaviour
         /* default countdown */
         this._hexPassDelayCountdown = 0;
 
-        /* assign hex */
-        GameObject userPlayer = GameObject.FindGameObjectWithTag("Player");
-        GameObject[] enemies = GameObject.FindGameObjectsWithTag("AI");
+        /* create list of players */
+        this.Players = GameObject.FindGameObjectsWithTag("Player").ToList<GameObject>();
 
-        int selectedPlayer = Random.Range(0, enemies.Length + 1);
-        if (selectedPlayer == enemies.Length)
-            userPlayer.GetComponent<HexManager>().Hexed = true;
-        else
-            enemies[selectedPlayer].GetComponent<HexManager>().Hexed = true;
+        /* assign hex */
+        // TODO: fix
+        int selectedPlayer = Random.Range(0, this.Players.Count);
+        GameObject hexedPlayer = this.Players[selectedPlayer];
+        hexedPlayer.GetComponent<HexManager>().Hexed = true;
 
         /* chunk information */
         this.chunkSpawner = this.GetComponent<ChunkSpawn>();
