@@ -33,22 +33,20 @@ public class AIMovement : MonoBehaviour
 
         if (this.hexManager.Hexed)
         {
-            RunKinematicArrive(this.targetTransform.position);
+            RunKinematicArrive(new Vector3(this.targetTransform.position.x, this.gravityYPos, this.targetTransform.position.z));
         }
         else
         {
-            // get the edges of a single plane
-            // default plane size is 10, so moving from the middle, +/- 5 is needed to get to edges
-            Vector3 mapBottomLeft = this.map.transform.TransformPoint(new Vector3(-5, 0, 5));
-            Vector3 mapTopRight = this.map.transform.TransformPoint(new Vector3(5, 0, -5));
-
             // get a random point on the map
             if (this.getNewRandLocation)
             {
-                float gravityYPos = 0.580005f; // this is approx the y height of players after gravity is applied; a better way probably exists
-                this.randomMapLocation = new Vector3(Random.Range(mapBottomLeft.x, mapTopRight.x), gravityYPos, Random.Range(mapBottomLeft.z, mapTopRight.z));
+                this.randomMapLocation = new Vector3(
+                    UnityEngine.Random.Range(this.gameManager.WorldLowerBound.x, this.gameManager.WorldUpperBound.x),
+                    this.gravityYPos,
+                    UnityEngine.Random.Range(this.gameManager.WorldLowerBound.z, this.gameManager.WorldUpperBound.z)
+                );
                 this.getNewRandLocation = false;
-                Debug.Log("ai going to: " + this.randomMapLocation);
+                Debug.Log(this.name + " ai going to: " + this.randomMapLocation);
             }
 
             RunKinematicArrive(this.randomMapLocation);

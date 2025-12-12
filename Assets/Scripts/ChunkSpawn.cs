@@ -5,20 +5,20 @@ public class ChunkSpawn : MonoBehaviour
 {
 
     [SerializeField] private GameObject[] chunkTypes;
-    [SerializeField] private int gridSize;
+    [SerializeField] private int _gridSize;
+    public int GridSize { get => this._gridSize; }
     private int numOfChunkTypes;
-    private List<GameObject> chunks;
+    public List<GameObject> Chunks { get; private set; }
     private List<GameObject> walls;
     // one scale unit in unity is equal to 10 on the transform.scale thingy
     private int unityOneBlockLength = 10;
 
-    void Start()
+    void Awake()
     {
         this.numOfChunkTypes = this.chunkTypes.Length;
-        this.chunks = new List<GameObject>();
+        this.Chunks = new List<GameObject>();
         this.walls = new List<GameObject>();
-        createGrid(this.gridSize);
-        Destroy(this);
+        createGrid(this._gridSize);
     }
 
     void createGrid(int gridSize)
@@ -44,7 +44,7 @@ public class ChunkSpawn : MonoBehaviour
                 Vector3 spawnPos = new Vector3(row * newChunkWidth, 0f, column * newChunkLength);
 
                 // instantiate the chunk and add it to the chunks list for later potential use
-                this.chunks.Add(Instantiate(newChunk, spawnPos, rotation, this.transform));
+                this.Chunks.Add(Instantiate(newChunk, spawnPos, rotation, this.transform));
 
             }
         }
@@ -60,7 +60,7 @@ public class ChunkSpawn : MonoBehaviour
         //   multiply the grid size to push the chunks such that half is before 0, 0 and half is after
         //   make all this negative because of the direction chunk instantiation happened
         //   add back one half because ??????
-        float offset = -(((chunkWidth * this.unityOneBlockLength) / 2) * this.gridSize) + ((chunkWidth * this.unityOneBlockLength) / 2);
+        float offset = -(((chunkWidth * this.unityOneBlockLength) / 2) * this._gridSize) + ((chunkWidth * this.unityOneBlockLength) / 2);
         this.transform.position = new Vector3(offset, 0, offset);
 
         // create walls
@@ -86,7 +86,7 @@ public class ChunkSpawn : MonoBehaviour
             GameObject wall = GameObject.CreatePrimitive(PrimitiveType.Cube);
 
             // scale wall
-            float length = chunkWidth * this.gridSize * this.unityOneBlockLength;
+            float length = chunkWidth * this._gridSize * this.unityOneBlockLength;
             wall.transform.localScale = new Vector3(length, 2, 0.5f);
 
             // rotate wall
@@ -95,7 +95,7 @@ public class ChunkSpawn : MonoBehaviour
             wall.transform.rotation = rotation;
 
             // move wall forward
-            wall.transform.position += wall.transform.forward * (this.gridSize * ((this.unityOneBlockLength / 2) * chunkWidth));
+            wall.transform.position += wall.transform.forward * (this._gridSize * ((this.unityOneBlockLength / 2) * chunkWidth));
             // and up
             wall.transform.position = new Vector3(wall.transform.position.x, 1, wall.transform.position.z);
 

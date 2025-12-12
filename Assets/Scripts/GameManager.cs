@@ -10,14 +10,18 @@ public class GameManager : MonoBehaviour
         get => this._hexPassDelayCountdown;
         set => this._hexPassDelayCountdown = hexPassDelay; // kinda dumb and confusing outside this line, but shorter than a whole method
     }
+
     private GameObject _hexedPlayer;
     public GameObject HexedPlayer
     {
         get => this._hexedPlayer;
         set => this._hexedPlayer = value;
     }
-    private List<Vector3> _worldGraph;
-    public List<Vector3> WorldGraph { get => this._worldGraph; }
+
+    private ChunkSpawn chunkSpawner;
+    public List<GameObject> WorldChunks { get; private set; }
+    public Vector3 WorldLowerBound { get; private set; }
+    public Vector3 WorldUpperBound { get; private set; }
 
     private void Awake()
     {
@@ -30,15 +34,17 @@ public class GameManager : MonoBehaviour
 
         int selectedPlayer = Random.Range(0, enemies.Length + 1);
         if (selectedPlayer == enemies.Length)
-        {
             userPlayer.GetComponent<HexManager>().Hexed = true;
-        }
         else
-        {
             enemies[selectedPlayer].GetComponent<HexManager>().Hexed = true;
-        }
 
-        /* fill out world graph */
+        /* chunk information */
+        this.chunkSpawner = this.GetComponent<ChunkSpawn>();
+        float bounds = this.chunkSpawner.GridSize * 5;
+        this.WorldLowerBound = new Vector3(-bounds, 0, -bounds);
+        this.WorldUpperBound = new Vector3(bounds, 0, bounds);
+
+        Debug.Log(this.WorldLowerBound + " bounds " + this.WorldUpperBound);
     }
 
     private void Update()
@@ -48,4 +54,5 @@ public class GameManager : MonoBehaviour
             this._hexPassDelayCountdown -= Time.deltaTime;
         }
     }
+
 }
