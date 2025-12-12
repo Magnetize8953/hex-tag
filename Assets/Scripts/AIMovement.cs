@@ -4,7 +4,7 @@ using System;
 public class AIMovement : MonoBehaviour
 {
 
-    private System.Random random = new System.Random(); // because seeding is weird with UnityEngine.Random
+    private System.Random random = new System.Random(Guid.NewGuid().GetHashCode()); // because seeding is weird with UnityEngine.Random
     private GameManager gameManager;
     private HexManager hexManager;
     private CharacterController controller;
@@ -14,7 +14,8 @@ public class AIMovement : MonoBehaviour
     public Vector3 velocity;
     private float gravityYPos = 0.580005f; // this is approx the y height of players after gravity is applied; a better way probably exists
 
-    private Transform targetTransform;
+    private Transform _targetTransform;
+    public Transform TargetTransform { get => this._targetTransform;  }
     private Vector3 randomMapLocation;
     private bool getNewRandLocation = true;
 
@@ -38,7 +39,7 @@ public class AIMovement : MonoBehaviour
 
         if (this.hexManager.Hexed)
         {
-            RunKinematicArrive(new Vector3(this.targetTransform.position.x, this.gravityYPos, this.targetTransform.position.z));
+            RunKinematicArrive(new Vector3(this._targetTransform.position.x, this.gravityYPos, this._targetTransform.position.z));
         }
         else
         {
@@ -95,8 +96,8 @@ public class AIMovement : MonoBehaviour
 
     public void GetRandomPlayerTarget()
     {
-        this.targetTransform = this.gameManager.Players[random.Next(this.gameManager.Players.Count)].transform;
-        while (this.targetTransform == null || this.targetTransform.transform == this.transform)
-            this.targetTransform = this.gameManager.Players[random.Next(this.gameManager.Players.Count)].transform;
+        this._targetTransform = this.gameManager.Players[random.Next(this.gameManager.Players.Count)].transform;
+        while (this._targetTransform == null || this._targetTransform.transform == this.transform)
+            this._targetTransform = this.gameManager.Players[random.Next(this.gameManager.Players.Count)].transform;
     }
 }

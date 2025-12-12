@@ -32,9 +32,9 @@ public class GameManager : MonoBehaviour
 
         /* create list of players */
         this.Players = GameObject.FindGameObjectsWithTag("Player").ToList<GameObject>();
+        this.Players.AddRange(GameObject.FindGameObjectsWithTag("AI").ToList<GameObject>());
 
         /* assign hex */
-        // TODO: fix
         int selectedPlayer = Random.Range(0, this.Players.Count);
         GameObject hexedPlayer = this.Players[selectedPlayer];
         hexedPlayer.GetComponent<HexManager>().Hexed = true;

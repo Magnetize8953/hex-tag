@@ -77,8 +77,13 @@ public class HexManager : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log("Collided with " + other.gameObject.ToString());
-        if (other.gameObject.tag == "Player" && this._hexed && this.gameManager.GetComponent<GameManager>().HexPassDelayCountdown <= 0)
+        Debug.Log(this.name + " collided with " + other.name);
+        if (
+            this._hexed
+            && this.gameManager.GetComponent<GameManager>().HexPassDelayCountdown <= 0
+            && (other.gameObject.tag == this._collisionTag
+                || (this.tag == "AI" && other.gameObject.transform == this.GetComponent<AIMovement>().TargetTransform))
+            )
         {
             other.gameObject.GetComponent<HexManager>().Hexed = true;
             other.gameObject.GetComponent<HexManager>().Frozen = true;
@@ -91,7 +96,7 @@ public class HexManager : MonoBehaviour
                 other.gameObject.GetComponent<AIMovement>().GetRandomPlayerTarget();
             this.gameManager.GetComponent<GameManager>().HexPassDelayCountdown = 5;
             this._hexed = false;
-            Debug.Log("Hex transferred");
+            Debug.Log("Hex transferred from " + this.name + " to " + other.name);
         }
     }
 }
