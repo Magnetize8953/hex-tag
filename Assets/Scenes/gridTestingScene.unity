@@ -1398,6 +1398,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
   hexPassDelay: 5
   _hexPassDelayCountdown: 0
+  hexRoundDuration: 60
+  _hexRoundCountdown: 0
 --- !u!4 &1294003482
 Transform:
   m_ObjectHideFlags: 0

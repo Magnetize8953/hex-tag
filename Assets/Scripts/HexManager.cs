@@ -94,7 +94,11 @@ public class HexManager : MonoBehaviour
             other.gameObject.GetComponent<HexManager>().SavedPosition = other.gameObject.transform.position;
             if (other.GetComponent<AIMovement>() != null)
                 other.gameObject.GetComponent<AIMovement>().GetRandomPlayerTarget();
+
+            this.gameManager.GetComponent<GameManager>().HexedPlayer = other.gameObject;
             this.gameManager.GetComponent<GameManager>().HexPassDelayCountdown = 5;
+            this.gameManager.GetComponent<GameManager>().HexRoundCountdown = 60;
+
             this._hexed = false;
             Debug.Log("Hex transferred from " + this.name + " to " + other.name);
         }

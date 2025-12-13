@@ -35,6 +35,24 @@ public class AIMovement : MonoBehaviour
 
     private void Update()
     {
+
+        // this is the jankiest thing ever
+        // basically. destroying things that other things depend on is not a great idea
+        // and thus. this.
+        try
+        {
+            var _ = this._targetTransform.position;
+        }
+        catch (MissingReferenceException)
+        {
+            // one player remaining
+            if (this.gameManager.Players.Count == 1)
+                return;
+
+            Debug.Log(this.name + " - changing player target due to destruction");
+            GetRandomPlayerTarget();
+        }
+
         if (this.hexManager.Frozen)
             return;
 
@@ -54,7 +72,7 @@ public class AIMovement : MonoBehaviour
                 );
                 this.getNewRandLocation = false;
                 this.locationCooldown = 10;
-                Debug.Log(this.name + " ai going to: " + this.randomMapLocation);
+                // Debug.Log(this.name + " ai going to: " + this.randomMapLocation);
             }
 
             RunKinematicArrive(this.randomMapLocation);
@@ -117,12 +135,12 @@ public class AIMovement : MonoBehaviour
 
             if (dot >= 0)
             { // if obstacle is to the right (or in front), nudge to the left
-                Debug.Log(this.name + " nudging to the left");
+                // Debug.Log(this.name + " nudging to the left");
                 towardsTarget = Quaternion.AngleAxis(-45f, Vector3.up) * towardsTarget;
             }
             else
             { // otherwise, if its to the left, nudge to the right
-                Debug.Log(this.name + " nudgling to the right");
+                // Debug.Log(this.name + " nudgling to the right");
                 towardsTarget = Quaternion.AngleAxis(45f, Vector3.up) * towardsTarget;
             }
 
@@ -153,8 +171,25 @@ public class AIMovement : MonoBehaviour
 
     public void GetRandomPlayerTarget()
     {
-        this._targetTransform = this.gameManager.Players[random.Next(this.gameManager.Players.Count)].transform;
-        while (this._targetTransform == null || this._targetTransform.transform == this.transform)
+        // one player remaining
+        if (this.gameManager.Players.Count == 1)
+            return;
+
+        try
+        {
             this._targetTransform = this.gameManager.Players[random.Next(this.gameManager.Players.Count)].transform;
+            while (this._targetTransform == null || this._targetTransform.transform == this.transform)
+                this._targetTransform = this.gameManager.Players[random.Next(this.gameManager.Players.Count)].transform;
+        }
+        catch (MissingReferenceException)
+        { // this exception should only be happening in frame perfect instances
+            Debug.Log(this.name + " - changing player target due to destruction");
+            GetRandomPlayerTarget();
+        }
+        catch (StackOverflowException)
+        { // also a frame perfect instance. should have been handled by that first condition, but slips past sometimes
+            Debug.Log(this.name + " - last player remaining");
+            return;
+        }
     }
 }
