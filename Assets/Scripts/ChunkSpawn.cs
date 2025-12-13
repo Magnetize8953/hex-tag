@@ -13,6 +13,7 @@ public class ChunkSpawn : MonoBehaviour
     // one scale unit in unity is equal to 10 on the transform.scale thingy
     private int unityOneBlockLength = 10;
 
+
     void Awake()
     {
         this.numOfChunkTypes = this.chunkTypes.Length;
@@ -23,6 +24,8 @@ public class ChunkSpawn : MonoBehaviour
 
     void createGrid(int gridSize)
     {
+        GameObject[] _currentObjects = new GameObject[3];
+
 
         // loop through the rows and columns of the grid
         for (int row = 0; row < gridSize; row++)
@@ -30,9 +33,18 @@ public class ChunkSpawn : MonoBehaviour
 
             for(int column = 0; column < gridSize; column++)
             {
-
-                // select a random chunk and grab its width and length for later positioning
-                GameObject newChunk = randomizeChunk(this.chunkTypes, this.numOfChunkTypes);
+                GameObject newChunk;
+                if(column == 0 && row == 0)
+                {
+                    //Sets first chunk to the basic grass type.
+                    newChunk = this.chunkTypes[0];
+                }
+                else
+                {
+                    // select a random chunk and grab its width and length for later positioning
+                    newChunk = randomizeChunk(this.chunkTypes, this.numOfChunkTypes);
+                }
+           
 
                 // get a random 90 degree rotation
                 int rot = 90 * Random.Range(0,3);
@@ -43,7 +55,7 @@ public class ChunkSpawn : MonoBehaviour
 
                 // instantiate the chunk and add it to the chunks list for later potential use
                 this.Chunks.Add(Instantiate(newChunk, spawnPos, rotation, this.transform));
-
+                
             }
         }
 
@@ -60,6 +72,12 @@ public class ChunkSpawn : MonoBehaviour
         //   add back one half because ??????
         float offset = -(((chunkWidth * this.unityOneBlockLength) / 2) * this._gridSize) + ((chunkWidth * this.unityOneBlockLength) / 2);
         this.transform.position = new Vector3(offset, 0, offset);
+        //Sets all Player/Enemy objects to offset spawn point.
+        _currentObjects = GameObject.FindGameObjectsWithTag("Player");
+        for (var i = 0; i < _currentObjects.Length; i++) {
+            _currentObjects[i].transform.position = new Vector3(offset, 0.5f, offset);
+        }
+
 
         // create walls
         createWalls(chunkWidth, chunkLength);
