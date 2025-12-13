@@ -83,10 +83,20 @@ public class ChunkSpawn : MonoBehaviour
         this.transform.position = new Vector3(offset, 0, offset);
         //Sets all Player/Enemy objects to offset spawn point.
         _currentObjects = GameObject.FindGameObjectsWithTag("Player");
+        GameObject[] _AIObs = GameObject.FindGameObjectsWithTag("AI");
+        GameObject[] _combinedArray = new GameObject[_AIObs.Length + _currentObjects.Length];
+        for (var arA = 0; arA < _currentObjects.Length; arA++)
+        {
+            _combinedArray[arA] = _currentObjects[arA];
+        }
+        for(var arB = 0; arB < _AIObs.Length; arB++)
+        {
+            _combinedArray[arB + _currentObjects.Length] = _AIObs[arB];
+        }
         try {
-            for (var i = 0; i < _currentObjects.Length; i++)
+            for (var i = 0; i < _combinedArray.Length; i++)
             {
-                _currentObjects[i].transform.position = new Vector3(offset, 0.75f, offset);
+                _combinedArray[i].transform.position = new Vector3(offset, 0.75f, offset);
             }
         }
         catch (MissingReferenceException e)
@@ -125,7 +135,7 @@ public class ChunkSpawn : MonoBehaviour
 
             // scale wall
             float length = chunkWidth * this._gridSize * this.unityOneBlockLength;
-            wall.transform.localScale = new Vector3(length, 2, 0.5f);
+            wall.transform.localScale = new Vector3(length, 10, 0.5f);
 
             // rotate wall
             int rot = 90 * i;
