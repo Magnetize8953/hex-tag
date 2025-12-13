@@ -76,13 +76,15 @@ public class GameManager : MonoBehaviour
             {
                 Destroy(this._hexedPlayer);
                 Debug.Log("player wins!!!");
-                // TODO: end game
+                Destroy(GameObject.FindGameObjectWithTag("Player"));
+                UnityEngine.SceneManagement.SceneManager.LoadScene("WinScreen");
                 return;
             }
             else
             {
                 Debug.Log("player loses!!!");
-                // TODO: end game
+                Destroy(GameObject.FindGameObjectWithTag("Player"));
+                UnityEngine.SceneManagement.SceneManager.LoadScene("LoseScreen");
                 return;
             }
         }
