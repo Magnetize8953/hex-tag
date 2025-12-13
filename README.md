@@ -1,5 +1,7 @@
 # Hex Tag
 
+![pillar](docs/pillar.png)
+
 ## Premise
 - Hex Tag is a PvE game
 - One player is chosen as a Hexed
@@ -30,3 +32,15 @@
 - Run
 - Tag
 - Push
+
+## Dev Notes
+Not everything could be finished.
+There are two main features that were developed, but not implemented in a player facing way: map size and Hex countdown timer selection.
+
+Both can be found under the GameManager object in the `gridTestingScene` scene.
+The map size is the `Grid Size` field under `Chunk Spawn (Script)`.
+Size X produces a map with X grids by X grids.
+The Hex countdown timer selection can be found by `Hex Round Duration` under `Game Manager (Script)`.
+Do not touch the `Hex Round Countdown` unless you want to quickly end the round.
+
+Also, start from the `MainMenu` scene!
