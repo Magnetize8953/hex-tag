@@ -18,6 +18,7 @@ public class AIMovement : MonoBehaviour
     public Transform TargetTransform { get => this._targetTransform;  }
     private Vector3 randomMapLocation;
     private bool getNewRandLocation = true;
+    private float locationCooldown = 10;
 
     [SerializeField] private float gravity = -9.81f;
 
@@ -44,7 +45,7 @@ public class AIMovement : MonoBehaviour
         else
         {
             // get a random point on the map
-            if (this.getNewRandLocation)
+            if (this.getNewRandLocation || this.locationCooldown <= 0)
             {
                 this.randomMapLocation = new Vector3(
                     UnityEngine.Random.Range(this.gameManager.WorldLowerBound.x, this.gameManager.WorldUpperBound.x),
@@ -52,11 +53,14 @@ public class AIMovement : MonoBehaviour
                     UnityEngine.Random.Range(this.gameManager.WorldLowerBound.z, this.gameManager.WorldUpperBound.z)
                 );
                 this.getNewRandLocation = false;
+                this.locationCooldown = 10;
                 Debug.Log(this.name + " ai going to: " + this.randomMapLocation);
             }
 
             RunKinematicArrive(this.randomMapLocation);
         }
+
+        this.locationCooldown -= Time.deltaTime;
 
     }
 
@@ -76,21 +80,74 @@ public class AIMovement : MonoBehaviour
         // normalise because all we care about is direction
         towardsTarget = towardsTarget.normalized;
 
+        #region obstacle avoidance
+        bool avoid = false;
+        float obstacleDistance = 1f;
+        int layerMask = 1 << 10;
+        Vector3 obstacleCoords = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
+        Vector3 feetRayCoords = new Vector3(this.transform.position.x, 0.25f, this.transform.position.z);
+        Ray ray = new Ray(feetRayCoords, towardsTarget.normalized);
+        RaycastHit hit;
+
+        Debug.DrawRay(feetRayCoords, towardsTarget.normalized * obstacleDistance, Color.red);
+        Debug.DrawRay(feetRayCoords, Quaternion.Euler(0f, 45, 0f) * towardsTarget.normalized * obstacleDistance, Color.blue); // left
+        Debug.DrawRay(feetRayCoords, Quaternion.Euler(0f, -45, 0f) * towardsTarget.normalized * obstacleDistance, Color.green); // right
+
+        // if there is something in the way to the front
+        if (Physics.Raycast(ray, out hit, obstacleDistance, layerMask))
+            obstacleCoords = hit.point;
+        ray = new Ray(feetRayCoords, Quaternion.Euler(0f, -45f, 0f) * towardsTarget.normalized);
+        // or to the left
+        if (Physics.Raycast(ray, out hit, obstacleDistance, layerMask))
+            obstacleCoords = hit.point;
+        // or to the right
+        ray = new Ray(feetRayCoords, Quaternion.Euler(0f, 45f, 0f) * towardsTarget.normalized);
+        if (Physics.Raycast(ray, out hit, obstacleDistance))
+            obstacleCoords = hit.point;
+
+        if (obstacleCoords != new Vector3(float.MaxValue, float.MaxValue, float.MaxValue))
+        {
+            avoid = true;
+
+            // get what would be our right vector, but proportionate to the direction we're traveling
+            Vector3 proportionalRight = Vector3.Cross(this.transform.up, towardsTarget).normalized;
+
+            // take the dot product of that and a vector from the NPC's location to where the collision occured
+            float dot = Vector3.Dot(proportionalRight, (obstacleCoords - this.transform.position).normalized);
+
+            if (dot >= 0)
+            { // if obstacle is to the right (or in front), nudge to the left
+                Debug.Log(this.name + " nudging to the left");
+                towardsTarget = Quaternion.AngleAxis(-45f, Vector3.up) * towardsTarget;
+            }
+            else
+            { // otherwise, if its to the left, nudge to the right
+                Debug.Log(this.name + " nudgling to the right");
+                towardsTarget = Quaternion.AngleAxis(45f, Vector3.up) * towardsTarget;
+            }
+
+            // repeat our prior process of normalizing
+            towardsTarget.Normalize();
+            towardsTarget *= this.speed;
+            this.velocity = towardsTarget;
+        }
+        #endregion
+
         // smoothly rotate to face target
         Quaternion targetRotation = Quaternion.LookRotation(towardsTarget);
         this.transform.rotation = Quaternion.Lerp(this.transform.rotation, targetRotation, 0.1f);
 
         // move forward in the direction we are facing
-        this.controller.Move(towardsTarget * this.speed * Time.deltaTime);
+        if (!avoid)
+            this.controller.Move(towardsTarget * this.speed * Time.deltaTime);
 
         // gravity
         if (this.controller.isGrounded && this.velocity.y < 0f)
-        {
             this.velocity.y = -2f;
-        }
 
         this.velocity.y += this.gravity * Time.deltaTime;
-        this.controller.Move(this.velocity * Time.deltaTime);
+        if (avoid)
+            this.controller.Move(this.velocity * Time.deltaTime);
 
     }
 
