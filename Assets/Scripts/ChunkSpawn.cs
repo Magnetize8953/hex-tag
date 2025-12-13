@@ -34,15 +34,24 @@ public class ChunkSpawn : MonoBehaviour
             for(int column = 0; column < gridSize; column++)
             {
                 GameObject newChunk;
-                if(column == 0 && row == 0)
-                {
-                    //Sets first chunk to the basic grass type.
-                    newChunk = this.chunkTypes[0];
+                try{
+                    if (column == 0 && row == 0)
+                    {
+                        //Sets first chunk to the basic grass type.
+                        newChunk = this.chunkTypes[0];
+                    }
+                    else
+                    {
+                        // select a random chunk and grab its width and length for later positioning
+                        newChunk = randomizeChunk(this.chunkTypes, this.numOfChunkTypes);
+                    }
                 }
-                else
+                catch (MissingReferenceException e)
                 {
-                    // select a random chunk and grab its width and length for later positioning
-                    newChunk = randomizeChunk(this.chunkTypes, this.numOfChunkTypes);
+                    /* If the array has a missing value somewhere, it'll automatically set the chunk to be the default grass chunk.
+                     */
+                    newChunk = this.chunkTypes[0];
+                    Debug.Log(e);
                 }
            
 
@@ -74,9 +83,22 @@ public class ChunkSpawn : MonoBehaviour
         this.transform.position = new Vector3(offset, 0, offset);
         //Sets all Player/Enemy objects to offset spawn point.
         _currentObjects = GameObject.FindGameObjectsWithTag("Player");
-        for (var i = 0; i < _currentObjects.Length; i++) {
-            _currentObjects[i].transform.position = new Vector3(offset, 0.5f, offset);
+        try {
+            for (var i = 0; i < _currentObjects.Length; i++)
+            {
+                _currentObjects[i].transform.position = new Vector3(offset, 0.75f, offset);
+            }
         }
+        catch (MissingReferenceException e)
+        {
+            /*Shouldn't technically ever happen, but in case a enemy or player object SOMEHOW gets destroyed 
+             * between chunks spawning and setting the spawn position, this will catch it.
+             * Realistically could only happen on one frame, but I don't trust Unity.
+             */
+            Debug.Log(e);
+            return;
+        }
+        
 
 
         // create walls
